@@ -1,4 +1,4 @@
-import { createInvoice, updateInvoice } from '@/app/lib/actions';
+import { createInvoice, updateInvoice, deleteInvoice } from '@/app/lib/actions';
 import Link from 'next/link';
 
 export function CreateInvoice() {
@@ -38,11 +38,11 @@ export function UpdateInvoice({ id }: { id: string }) {
 	);
 }
 
-export function DeleteInvoice({ id }: { id: string }) {
-	const updateInvoiceWithId = updateInvoice.bind(null, id); //
+export function DeleteInvoice({ customer_id }: { customer_id: string }) {
+	const deleteInvoiceWithId = deleteInvoice.bind(null, customer_id); //
 
 	return (
-		<form action={updateInvoiceWithId}>
+		<form action={deleteInvoiceWithId}>
 			<button
 				className="rounded-md border p-2 hover:bg-gray-100"
 			>

@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { User, Invoices, Customers } from './lib/queries';
 import { formatDateToLocal } from '@/app/lib/utils';
-import {CreateInvoice, UpdateInvoice } from './ui/buttons';
+import {CreateInvoice, UpdateInvoice, DeleteInvoice } from './ui/buttons';
 import Link from 'next/link'
 
 export const metadata: Metadata = {
@@ -59,7 +59,7 @@ export default async function Home() {
 								<td>{invoice.status}</td>
 								<td>{formatDateToLocal(invoice.date)}</td>
 								<td>
-									<button className="rounded-md border p-2 hover:bg-gray-100">button</button>
+									<DeleteInvoice customer_id={invoice.customer_id}/>
 								</td>
 							</tr>
 						))}

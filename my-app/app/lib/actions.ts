@@ -77,3 +77,14 @@ export async function updateInvoice(id: string): Promise<void> {
 
 	revalidatePath('/dashboard/invoices');
 }
+
+export async function deleteInvoice(customer_id: string): Promise<void> {
+
+	const query = `DELETE FROM invoices WHERE customer_id = $1`;
+	const values = [customer_id];
+	await pool.query(query, values);
+
+	// $1에 values의 첫번째 값, $2에 values의 두 번째 값이 대입
+
+	revalidatePath('/');
+}
