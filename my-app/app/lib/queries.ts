@@ -23,9 +23,24 @@ export interface Customers {
 	email: string;
   image_url: string;
 }
+export interface Post {
+	index: number;
+	tit: string;
+	sentence: string;
+  date: string;
+}
 
 export async function getUsers(): Promise<User[]> {
   const { rows } = await pool.query('SELECT * FROM users');
+  return rows;
+}
+
+export async function getPost(): Promise<Post[]> {
+  const { rows } = await pool.query(`
+	SELECT *
+	FROM post
+	ORDER BY post.index DESC
+	`);
   return rows;
 }
 

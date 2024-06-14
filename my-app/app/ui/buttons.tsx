@@ -2,8 +2,6 @@ import { createInvoice, updateInvoice, deleteInvoice } from '@/app/lib/actions';
 import Link from 'next/link';
 
 export function CreateInvoice() {
-
-	// const CreateInvoiceWithId = createInvoice.bind(null, id);
 	return (
 		<Link
 			href="/create"
@@ -11,16 +9,6 @@ export function CreateInvoice() {
 		>
 			추가
 		</Link>
-
-
-/* 		<form action={CreateInvoiceWithId}>
-			<button
-				className="rounded-md border p-2 hover:bg-gray-100"
-			>
-				추가
-			</button>
-		</form> */
-
 	);
 }
 
@@ -38,15 +26,15 @@ export function UpdateInvoice({ id }: { id: string }) {
 	);
 }
 
-export function DeleteInvoice({ customer_id }: { customer_id: string }) {
-	const deleteInvoiceWithId = deleteInvoice.bind(null, customer_id); //
+export function DeleteInvoice({ id }: { id: string }) {
+	const deleteInvoiceWithId = deleteInvoice.bind(null, id); //
 
 	return (
 		<form action={deleteInvoiceWithId}>
 			<button
 				className="rounded-md border p-2 hover:bg-gray-100"
 			>
-				업데이트
+				삭제
 			</button>
 		</form>
 	);

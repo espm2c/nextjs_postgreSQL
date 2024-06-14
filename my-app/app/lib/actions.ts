@@ -5,7 +5,8 @@ import pool from './db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-const FormSchema = z.object({
+
+const FormSchema = z.object({ // npm zod 사용
 	id: z.string(),
 	customerId: z.string(),
 	amount: z.coerce.number(),
@@ -13,20 +14,12 @@ const FormSchema = z.object({
 	date: z.string(),
 });
 
-// zod를 사용하는 이유는 타입스크립트가 런타임에서는 타입에러를 잡을 수 없기 때문입니다. infer
+// zod를 사용하는 이유는 타입스크립트가 런타임에서는 타입에러를 잡을 수 없기 때문입니다.
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true }); // zod, 확실한 키를 제거하기 위해 .omit를 사용. 반대는 .pick()
 
 export async function createInvoice(formData: FormData) {
-
-	const { customerId, amount, status } = CreateInvoice.parse({
-		customerId: formData.get('customerId'),
-		amount: formData.get('amount'),
-		status: formData.get('status'),
-	});
-
-	const amountInCents = amount * 100;
-	const date = new Date();
+	console.log(CreateInvoice)
 	const generateRandomString = (num: number) => {
 		const characters = '1234567890abcdefghijklmnopqrstuvwxyz';
 		let result = '';
@@ -34,19 +27,25 @@ export async function createInvoice(formData: FormData) {
 		for (let i = 0; i < num; i++) {
 			result += characters.charAt(Math.floor(Math.random() * charactersLength));
 		}
-
 		return result;
 	}
 
-	const id = `${generateRandomString(8)}-${generateRandomString(4)}-${generateRandomString(4)}-${generateRandomString(4)}-${generateRandomString(12)}`
+	const { customerId, amount, status } = CreateInvoice.parse({
+		customerId: formData.get('customerId'), // customerId key에 해당 폼의 name="customerId"이 유효하면 정보를 반환합니다.
+		amount: formData.get('amount'),
+		status: formData.get('status'),
+	}); // 데이터가 유효한지 검증. 유효하면 풀타입 정보를 반환! 아니면 오류를 보냄.
+
+	const amountInCents = amount * 100;
+	const date = new Date();
 
 	try {
 		const query = `
 		INSERT INTO invoices (id, customer_id, amount, status, date)
 		VALUES ($1, $2, $3, $4, $5)
 		`;
-
-		const values = [id, customerId, amountInCents, status, date]
+		const id = `${generateRandomString(8)}-${generateRandomString(4)}-${generateRandomString(4)}-${generateRandomString(4)}-${generateRandomString(12)}`;
+		const values = [id, customerId, amountInCents, status, date];
 
 		await pool.query(query, values);
 	} catch (error) {
@@ -57,10 +56,7 @@ export async function createInvoice(formData: FormData) {
 
 	revalidatePath('/');
 	redirect('/');
-
-
 }
-
 
 export async function updateInvoice(id: string): Promise<void> {
 
@@ -78,13 +74,47 @@ export async function updateInvoice(id: string): Promise<void> {
 	revalidatePath('/dashboard/invoices');
 }
 
-export async function deleteInvoice(customer_id: string): Promise<void> {
-
-	const query = `DELETE FROM invoices WHERE customer_id = $1`;
-	const values = [customer_id];
+export async function deleteInvoice(id: string): Promise<void> {
+	const query = `DELETE FROM invoices WHERE id = $1`;
+	const values = [id];
 	await pool.query(query, values);
 
 	// $1에 values의 첫번째 값, $2에 values의 두 번째 값이 대입
 
 	revalidatePath('/');
+}
+
+const PostFormSchema = z.object({
+	tit: z.string(),
+	sentence: z.string(),
+	date: z.string(),
+});
+const AddPost = PostFormSchema.omit({ date: true }); // zod, 확실한 키를 제거하기 위해 .omit를 사용. 반대는 .pick()
+
+
+export async function addPost(formData: FormData) {
+	const { tit, sentence } = AddPost.parse({
+		tit: formData.get('tit'),
+		sentence: formData.get('sentence')
+	});
+
+	const date = new Date();
+
+	try {
+		const query = `
+		INSERT INTO post (tit, sentence, date)
+		VALUES ($1, $2, $3)
+		`;
+
+		const values = [tit, sentence, date];
+
+		await pool.query(query, values);
+	} catch (error) {
+		return {
+			message: 'Database Error: Failed to Create Invoice.',
+		};
+	}
+
+	revalidatePath('/post');
+	redirect('/post');
 }
