@@ -1,4 +1,5 @@
 'use client'
+
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -21,9 +22,6 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-
-
-import { User, Invoices, Customers } from '../lib/queries';
 
 interface Data {
   id: number;
@@ -258,18 +256,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     </Toolbar>
   );
 }
-async function fetchInvoices(): Promise<Invoices[]> {
-	const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/invoices`, { next: { revalidate: 1 } });
-	if (!res.ok) {
-		throw new Error('Failed to fetch invoices');
-	}
-	const data = await res.json();
-
-	return data.invoices;
-}
-
-
-
 export default function EnhancedTable() {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('calories');

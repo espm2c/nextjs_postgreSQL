@@ -1,8 +1,13 @@
 import { Metadata } from 'next'
-import { Invoices } from './lib/queries';
+import { Invoices } from '../lib/queries';
 import { formatDateToLocal } from '@/app/lib/utils';
-import { CreateInvoice, UpdateInvoice, DeleteInvoice } from './ui/buttons';
+import { CreateInvoice, UpdateInvoice, DeleteInvoice } from '../ui/buttons';
 import Link from 'next/link'
+
+
+import { Divider, Radio, Table } from 'antd';
+import type { TableColumnsType } from 'antd';
+
 
 async function fetchInvoices(): Promise<Invoices[]> {
 	const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/invoices`, { next: { revalidate: 1 } });
@@ -23,17 +28,53 @@ export const metadata: Metadata = {
 
 export default async function Home() {
 	const invoices = await fetchInvoices();
-	console.log(invoices);
+	const columns = [
+		{
+			title: 'index',
+			dataIndex: 'index',
+			key: 'index',
+		},
+		{
+			title: 'id',
+			dataIndex: 'id',
+			key: 'id',
+		},
+		{
+			title: 'name',
+			dataIndex: 'name',
+			key: 'name',
+		},
+		{
+			title: 'email',
+			dataIndex: 'email',
+			key: 'email',
+		},
+		{
+			title: 'amount',
+			dataIndex: 'amount',
+			key: 'amount',
+		},
+		{
+			title: 'status',
+			dataIndex: 'status',
+			key: 'status',
+		},
+		{
+			title: 'date',
+			dataIndex: 'date',
+			key: 'date',
+		},
+	];
 
 	return (
 		<div>
 			<h1>DATABASE PostgreSQL</h1>
-
+			<Table dataSource={invoices} columns={columns} />;
 			<ul>
 				<li><Link href="/dashboard">Dashboard</Link></li>
 				<li><Link href="/post">post</Link></li>
 			</ul>
-			<CreateInvoice />
+
 			<div>
 				<h2>Invoices</h2>
 				<table className="table-auto">

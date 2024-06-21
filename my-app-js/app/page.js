@@ -1,10 +1,15 @@
 import { Metadata } from 'next'
-import { Invoices } from './lib/queries';
-import { formatDateToLocal } from '@/app/lib/utils';
+// import { Invoices } from './lib/queries';
+//import { formatDateToLocal } from '@/app/lib/utils';
 import { CreateInvoice, UpdateInvoice, DeleteInvoice } from './ui/buttons';
 import Link from 'next/link'
 
-async function fetchInvoices(): Promise<Invoices[]> {
+
+//import { DataGrid } from '@mui/x-data-grid';
+
+
+
+async function fetchInvoices(){
 	const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/invoices`, { next: { revalidate: 1 } });
 	if (!res.ok) {
 		throw new Error('Failed to fetch invoices');
@@ -15,7 +20,7 @@ async function fetchInvoices(): Promise<Invoices[]> {
 }
 
 
-export const metadata: Metadata = {
+export const metadata = {
 	title: 'Next.js',
 }
 
@@ -23,8 +28,6 @@ export const metadata: Metadata = {
 
 export default async function Home() {
 	const invoices = await fetchInvoices();
-	console.log(invoices);
-
 	return (
 		<div>
 			<h1>DATABASE PostgreSQL</h1>
@@ -34,6 +37,7 @@ export default async function Home() {
 				<li><Link href="/post">post</Link></li>
 			</ul>
 			<CreateInvoice />
+
 			<div>
 				<h2>Invoices</h2>
 				<table className="table-auto">
