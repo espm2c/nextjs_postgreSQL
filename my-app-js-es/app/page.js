@@ -32,8 +32,9 @@ import { Create } from '@/app/create/page'
 
 /* 열을 몇개 보여줄 것인지 결정을 해줍니다. */
 function descendingComparator(a, b, orderBy) {
-	if (b[orderBy] < a[orderBy]) {
+	if (b[orderBy] < a[orderBy]) { //
 		return -1;
+
 	}
 	if (b[orderBy] > a[orderBy]) {
 		return 1;
@@ -43,9 +44,10 @@ function descendingComparator(a, b, orderBy) {
 
 function getComparator(order, orderBy) { // 초기 order는 'desc', 초기 orderBy는 'index'
 	return order === 'desc'
-		? (a, b) => descendingComparator(a, b, orderBy) // 초기 order가 내림차순이면 descendingComparator()를 그대로 사용
-		: (a, b) => -descendingComparator(a, b, orderBy);// 초기 order가 오름차순이면 descendingComparator()에 '-'를 곱하여 사용
+		? (a, b) => descendingComparator(a, b, orderBy) // 초기 order가 내림차순(desc)이면 descendingComparator()를 그대로 사용
+		: (a, b) => -descendingComparator(a, b, orderBy);// 초기 order가 오름차순(asc)이면 descendingComparator()에 '-'를 곱하여 사용
 }
+// order의 조건으로 익명함수 발생
 
 function stableSort(array, comparator) { // sort 명령 시, 데이터를 정렬하기 위한 함수
 	return array.slice().sort(comparator);
@@ -61,7 +63,6 @@ export default function Page() {
 	const [loading, setLoading] = React.useState(true);
 	const [order, setOrder] = React.useState('desc');
 	const [orderBy, setOrderBy] = React.useState('index');
-
 	const [page, setPage] = React.useState(parseInt(pageQuery || '0', 10)); // pageQuery 값이 초기에 없을 경우 0으로 설정하여 page에 이항
 	const [rowsPerPage, setRowsPerPage] = React.useState(parseInt(limitQuery || '5', 10));
 
@@ -73,6 +74,7 @@ export default function Page() {
 		pageQuery * rowsPerPage > invoices.length && updatePaging(page);
 	}, [limitQuery, pageQuery, page]);
 	/* // pagination 변경시  */
+
 	/* invoices 데이터 불러오기 */
 	React.useEffect(() => {
 		async function fetchInvoices() {
@@ -94,11 +96,12 @@ export default function Page() {
 		const isAsc = orderBy === property && order === 'asc';
 		setOrder(isAsc ? 'desc' : 'asc');
 		setOrderBy(property);
+		setSelected([])
 	};
 
 	const handleSelectAllClick = (event) => {
 		if (event.target.checked) {
-			const newSelected = invoices.map((n) => n.id);
+			const newSelected = visibleRows.map((n) => n.id);
 			setSelected(newSelected);
 			return;
 		}
@@ -139,6 +142,7 @@ export default function Page() {
 	const handleChangePage = (event, newPage) => {
 		setPage(newPage);
 		updatePaging(newPage);
+		setSelected([]);
 	};
 	/* // paging 관련 */
 
@@ -207,37 +211,6 @@ export default function Page() {
 		handleDelete: PropTypes.func.isRequired,
 	};
 
-	/* 삭제 관련 */
-/* 	async function handleDelete() {
-		if (window.confirm(`${selected.length}개의 파일을 삭제합니까?`)) {
-			const deleteRequests = selected.map(async (id) => {
-				try {
-					const response = await fetch(`/api/invoices/${id}`, {
-						method: 'DELETE',
-					});
-					if (!response.ok) {
-						throw new Error('Failed to delete invoice from handleDelete');
-					}
-				} catch (error) {
-					console.error('Error deleting invoice from handleDelete:', error);
-				}
-			});
-
-			Promise.all(deleteRequests)
-				.then(() => {
-					setInvoices((prevInvoices) =>
-						prevInvoices.filter((invoice) => !selected.includes(invoice.id)), // invoice는 배열. invoice배열에서 선택된 배열(selected)중 invoice.id값이 같지 않은 것으로 setInvoices 합니다.
-					);
-					setSelected([]); // 그리고 selected를 비웁니다.
-				})
-				.catch((error) => {
-					console.error('Error deleting invoices:', error);
-				});
-			alert("삭제가 완료되었습니다.")
-		} else {
-			alert("삭제가 취소되었습니다.")
-		}
-	}; */
 
 	async function handleDelete(selected, setInvoices, setSelected) {
 		if (window.confirm(`${selected.length}개의 파일을 삭제합니까?`)) {
@@ -259,6 +232,7 @@ export default function Page() {
 				);
 				setSelected([]);
 				alert('삭제가 완료되었습니다.');
+
 			} catch (error) {
 				console.error('Error deleting invoices:', error);
 				alert('삭제 중 오류가 발생했습니다.');
@@ -303,6 +277,7 @@ export default function Page() {
 								onSelectAllClick={handleSelectAllClick}
 								onRequestSort={handleRequestSort}
 								rowCount={invoices.length}
+								rowsPerPage={rowsPerPage}
 							/>
 							<TableBody>
 								{visibleRows.map((invoice, index) => {
