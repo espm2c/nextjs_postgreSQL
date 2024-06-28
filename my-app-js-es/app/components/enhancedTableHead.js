@@ -18,7 +18,7 @@ const headCells = [ // table thead에 들어갈 배열
 ];
 
 export default function EnhancedTableHead(props) { // EnhancedTableHead 컴포넌트
-	const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, rowsPerPage } = props; // 각 상수에 props를 이항
+	const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, visibleRows } = props; // 각 상수에 props를 이항
 
 	const createSortHandler = (property) => (event) => {
 		onRequestSort(event, property);
@@ -31,7 +31,7 @@ export default function EnhancedTableHead(props) { // EnhancedTableHead 컴포�
 					<Checkbox // table thead에 들어가는 checkbox 입니다.
 						color="primary"
 						indeterminate={numSelected > 0 && numSelected < rowCount}
-						checked={numSelected === rowsPerPage}
+						checked={numSelected === visibleRows}
 						//checked={rowCount > 0 && numSelected === rowCount}
 						//checked={false}
 						onChange={onSelectAllClick}

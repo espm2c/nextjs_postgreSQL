@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { deleteInvoice } from '@/app/lib/actions';
-
 export async function POST(request) {
 	try {
 		const { ids } = await request.json();

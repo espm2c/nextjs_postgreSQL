@@ -23,7 +23,7 @@ export async function createInvoice(formData) {
 	}); // 데이터가 유효한지 검증. 유효하면 풀타입 정보를 반환! 아니면 오류를 보냄.
 
 	const amountInCents = amount * 100;
-	const date = new Date();
+	const date = new Date().toString();
 
 	try {
 		const query = `

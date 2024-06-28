@@ -9,9 +9,20 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
+import { formatDateToLocal } from '@/app/lib/utils';
 import { CreateInvoice } from '@/app/ui/buttons';
 
-import EnhancedTableHead from '@/app/components/enhancedTableHead';
+import EnhancedTableHead from '@/app/components/enhancedTableHead'
+import EnhancedTableToolbar from '@/app/components/enhancedTableToolbar'
+
+
+import Box from '@mui/material/Box';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import Checkbox from '@mui/material/Checkbox';
+import { visuallyHidden } from '@mui/utils';
 
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
@@ -21,8 +32,65 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+
 /* nextjs */
 import { useSearchParams } from 'next/navigation';
+
+const headCells = [ // table thead에 들어갈 배열
+	{ id: 'index', label: 'Index', },
+	{ id: 'name', label: 'Name', },
+	{ id: 'email', label: 'E-mail', },
+	{ id: 'amount', label: 'Amount', },
+	{ id: 'status', label: 'Status', },
+	{ id: 'date', label: 'Date', },
+];
+
+function EnhancedTableHead(props) { // EnhancedTableHead 컴포넌트
+	const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, visibleRows } = props; // 각 상수에 props를 이항
+
+	const createSortHandler = (property) => (event) => {
+		onRequestSort(event, property);
+	};
+
+	return (
+		<TableHead>
+			<TableRow>
+				<TableCell padding="checkbox">
+					<Checkbox // table thead에 들어가는 checkbox 입니다.
+						color="primary"
+						indeterminate={numSelected > 0 && numSelected < rowCount}
+						checked={numSelected === visibleRows}
+						//checked={rowCount > 0 && numSelected === rowCount}
+						//checked={false}
+						onChange={onSelectAllClick}
+						inputProps={{
+							'aria-label': 'select all desserts',
+						}}
+					/>
+				</TableCell>
+				{headCells.map((headCell) => (
+					<TableCell
+						key={headCell.id}
+						sortDirection={orderBy === headCell.id ? order : false}
+					>
+						<TableSortLabel
+							active={orderBy === headCell.id}
+							direction={orderBy === headCell.id ? order : 'asc'}
+							onClick={createSortHandler(headCell.id)}
+						>
+							{headCell.label}
+							{orderBy === headCell.id ? (
+								<Box component="span" sx={visuallyHidden}>
+									{order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+								</Box>
+							) : null}
+						</TableSortLabel>
+					</TableCell>
+				))}
+			</TableRow>
+		</TableHead>
+	);
+}
 
 
 /* 열을 몇개 보여줄 것인지 결정을 해줍니다. */
@@ -47,9 +115,7 @@ function stableSort(array, comparator) { // sort 명령 시, 데이터를 정렬
 	return array.slice().sort(comparator);
 }
 
-
-
-export default function Page() {
+export default function Table() {
 	const searchParams = useSearchParams();
 	const pageQuery = searchParams.get('page');
 	const limitQuery = searchParams.get('limit');
@@ -87,9 +153,7 @@ export default function Page() {
 		async function fetchInvoices() {
 			try {
 				const response = await fetch(
-					'/api/invoices' // 취득하려는 resource의 URL 문자열
-					// /api/invoices/route.js 에 요청하면 해당 파일 내 function이 실행.
-
+					'/api/invoices'
 				);
 				const data = await response.json();
 				if (Array.isArray(data)) {
@@ -238,7 +302,7 @@ export default function Page() {
 					{
 						method: 'POST', // POST 메서드 실행
 						headers: {
-							'Content-Type': 'application/json', // 요청 본문의 형식을 JSON으로 지정
+							'Content-Type': 'application/json',
 						},
 						body: JSON.stringify({ ids: selected }),
 					});
