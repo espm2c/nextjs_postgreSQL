@@ -36,17 +36,17 @@ export async function getServerSideProps() {
 	try{
 		// API에서 데이터 가져오기
 		const res = await fetch(
-			`http://localhost:3000/api/customers`, // 해당 경로에 요청
-			{ next: { revalidate: 1 } }
+			`http://localhost:3000/api/customers` // 해당 경로에 요청
+
 		);
 		if (!res.ok) {
 			throw new Error('Failed to fetch customers');
 		}
-		const data = await res.json();
+		const customers = await res.json();
 		// 가져온 데이터를 props로 전달
 		return {
 			props: {
-				customers: data,
+				customers
 			},
 		}
 	}catch(error){
